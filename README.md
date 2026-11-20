@@ -14,6 +14,8 @@
 - **Font Doctor:** kiểm tra font của game có đủ chữ tiếng Việt không, thiếu thì thay bằng font Be Vietnam Pro kèm theo.
 - **Dịch tiếp được:** mỗi câu dịch xong được lưu ngay. Dừng giữa chừng, hết credit, tắt máy… lần sau bấm Dịch tiếp là chạy tiếp, không dịch lại câu cũ.
 - Hỗ trợ game dùng plugin **KNS_CsvReader** (chữ nằm trong thư mục `csv/`).
+- Hỗ trợ game dùng **`data/Languages.tsv`** của VisuStella MessageCore (thoại là mã `\tl{A0001}`) – thay cột English bằng tiếng Việt, trong game chọn **English** ở Text Language.
+- Hỗ trợ game dùng hệ thống chữ **`www/loc/`** của Remtairy (`RemMap_EN.json`, `RemDesc_EN.json`, `RemLines.json`) – thay chữ tiếng Anh bằng tiếng Việt, trong game chọn **English**.
 - Giao diện tiếng Việt, chế độ Sáng / Tối, bản **portable** (không cần cài đặt).
 
 ## Tải và chạy
@@ -39,6 +41,10 @@ Thêm vào thư viện **không sửa gì** trong thư mục game.
 
 Mở game → tab **Dịch**. Bên trái là danh sách file theo nhóm (Thoại, Vật phẩm, Kỹ năng…) – bỏ chọn file bạn không muốn dịch.
 Bấm **Ước tính** để biết số câu, thời gian và chi phí nếu dùng AI.
+
+### 2b. Dịch thử (khuyên dùng với game lạ)
+
+Bấm **Dịch thử [VI]** ở màn chờ: Nexa thêm `[VI]` vào đầu mọi câu nó sẽ dịch rồi chép vào game – **không tốn tiền, không gọi engine nào**. Vào game xem: chỗ có `[VI]` là Nexa dịch tới, chỗ còn tiếng gốc là Nexa chưa đọc được (game lưu chữ ở chỗ khác). Xem xong bấm **Khôi phục**.
 
 ### 3. Dịch
 
@@ -71,6 +77,8 @@ Bấm **Chép vào game**. Nexa chạy thử trước và báo file nào sẽ đ
 Vào game và chơi thử. **Nên chơi New Game:** save cũ có thể giữ tên vật phẩm / nhân vật cũ.
 
 > **Game dùng KNS_CsvReader:** bản tiếng Việt được ghi vào cột ngôn ngữ English – trong game vào Option / Language chọn **English**.
+>
+> **Game có thư mục `www\loc` (RemMap_EN.json…):** chọn định dạng **Thư mục loc** (Nexa tự chọn khi thêm game), dịch rồi chép vào game, trong game chọn ngôn ngữ **English**.
 
 ### 6. Khôi phục bản gốc
 
@@ -151,6 +159,7 @@ npm install
 |---|---|
 | `npm run app:dev` | Chạy app ở chế độ phát triển (sửa giao diện tự cập nhật). Dữ liệu lưu trong thư mục dự án. |
 | `npm run dist` | Đóng gói → `release\NexaTranslation-<phiên bản>-x64.zip` và bản portable. |
+| `npm run deploy -- "D:\NexaTranslation"` | Build rồi **cập nhật thẳng bản app đang dùng** (giữ nguyên dữ liệu). Lần sau chỉ cần `npm run deploy`. |
 | `npm run typecheck` | Kiểm tra kiểu TypeScript. |
 | `npm test` | Chạy bộ kiểm thử. |
 | `npm run dev -- <lệnh> "<thư mục game>"` | Dùng bản dòng lệnh (CLI): `scan`, `estimate`, `translate`, `glossary`, `export`, `restore`, `font`… |

@@ -20,4 +20,14 @@ export interface Entry {
    * liên tiếp nhau (phần tử cuối của path) được gộp thành 1 câu để dịch.
    */
   block?: string;
+  /**
+   * Khối giữ ĐÚNG số dòng gốc: bản dịch được chia đều vào các dòng có sẵn, không thêm dòng
+   * (vd mô tả kỹ năng trong khung cố định, câu thoại trong nhật ký trận đánh không xuống dòng được).
+   */
+  fixedLines?: boolean;
+  /**
+   * Bản dịch ngắn hơn (ít dòng hơn bản gốc) → chia đều vào đủ số dòng thay vì để dòng trống
+   * (mảng dòng được game nối bằng "\n" – dòng trống sẽ thành dòng trắng trong khung thoại).
+   */
+  fillLines?: boolean;
 }

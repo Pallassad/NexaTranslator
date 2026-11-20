@@ -37,7 +37,7 @@ export interface RunState {
 export interface PaidDialogState { promptId: number; offer: PaidOffer }
 
 export type DialogState =
-  | { kind: "export"; gameId: string; preview: ExportPreview }
+  | { kind: "export"; gameId: string; preview: ExportPreview; test?: { files: number; lines: number } }
   | { kind: "restore"; gameId: string; count: number; conflicts: string[] }
   | { kind: "source-invalid"; problem: string; gameId: string }
   | { kind: "not-game"; message: string; guess?: string | null; path: string }

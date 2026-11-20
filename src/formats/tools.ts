@@ -2,6 +2,8 @@ import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { rpgmData } from "./rpgm-data";
 import { rpgmKnsCsv } from "./rpgm-kns-csv";
+import { rpgmRemLoc } from "./rpgm-rem-loc";
+import { rpgmLangTsv } from "./rpgm-lang-tsv";
 import type { FormatAdapter } from "./types";
 
 /**
@@ -25,7 +27,7 @@ export const TOOLS: ToolInfo[] = [
     name: "RPG Maker MV/MZ",
     description: "Dịch thoại, vật phẩm, kỹ năng, nhiệm vụ và chữ hệ thống. Có kiểm tra font tiếng Việt và khôi phục game về bản gốc.",
     status: "ready",
-    adapters: [rpgmKnsCsv, rpgmData],
+    adapters: [rpgmRemLoc, rpgmLangTsv, rpgmKnsCsv, rpgmData],
   },
   { id: "renpy", name: "Ren'Py", description: "Visual novel dùng file .rpy.", status: "soon", adapters: [] },
   { id: "unity", name: "Unity", description: "Game Unity dùng file chữ trong thư mục dữ liệu.", status: "soon", adapters: [] },

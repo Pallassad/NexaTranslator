@@ -137,12 +137,33 @@ export async function exportPreview() {
   }
 }
 
+/** Dịch thử: thêm [VI] vào các file đang chọn → hỏi trước khi chép vào game (dùng chung hộp thoại Chép vào game). */
+export async function testPreview() {
+  const { gameId, sel } = getState();
+  if (!gameId) return;
+  try {
+    const p = await api().game.testPreview(gameId, [...sel]);
+    setState({ dialog: { kind: "export", gameId, preview: p, test: { files: p.files, lines: p.lines } } });
+  } catch (e) {
+    handleError(e, "Không tạo được bản dịch thử");
+  }
+}
+
 export async function exportRun(force: boolean) {
   const d = getState().dialog;
   if (d?.kind !== "export") return;
   setState({ dialog: null });
   try {
-    const r = await api().game.exportRun(d.gameId, force);
+    const r = d.test ? await api().game.testRun(d.gameId, force) : await api().game.exportRun(d.gameId, force);
+    if (d.test) {
+      const written = r.results.filter(x => x.written).length;
+      addLog("success", `Đã chép bản dịch thử [VI] vào game (${written} file)`);
+      toast("success", "Đã chép bản dịch thử vào game",
+        "Vào game xem chữ có [VI] ở đâu. Xem xong bấm Khôi phục để trả game về bản gốc.");
+      for (const n of r.notes) setTimeout(() => toast("info", "Nhớ làm trong game", n), 300);
+      refreshCard(r.card);
+      return;
+    }
     const written = r.results.filter(x => x.written).length;
     const skipped = r.results.filter(x => x.status === "conflict" && !x.written).length;
     addLog("success", `Đã chép ${written} file vào game${skipped ? `, bỏ qua ${skipped} file xung đột` : ""}`);

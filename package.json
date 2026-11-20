@@ -10,7 +10,8 @@
     "app": "npm run app:build && electron dist-electron/main.mjs",
     "test": "vitest run",
     "typecheck": "tsc && tsc -p ui && tsc -p electron",
-    "dist": "npm run app:build && electron-builder --win --x64"
+    "dist": "npm run app:build && electron-builder --win --x64",
+    "deploy": "npm run app:build && electron-builder --win --x64 --dir && node scripts/deploy.mjs"
   },
   "keywords": [],
   "author": "",

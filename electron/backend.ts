@@ -2,7 +2,7 @@ import { join } from "node:path";
 import {
   addGame, AddGameError, autoWidth, checkEngines, describeGame, estimateRows, exportGame, fontCheck, fontFix,
   fontReset, getGame, getTool, glossaryView, listFiles, listGames, openGame, prepareTranslation, removeGame,
-  restoreGameFiles, runTranslate, setKey, SourceInvalidError, TOOLS, updateGame,
+  restoreGameFiles, runTranslate, buildTestMark, exportTestMark, setKey, SourceInvalidError, TOOLS, updateGame,
   listErrors, fixError, keepOriginal, retranslateErrors, reviewedLines, unkeepAll, writeOutput,
   actorNamesView, suggestActorNames, saveActorNames, saveUserGlossary, type UserGlossaryInput,
   type AppContext, type GameSession, type TranslationPlan,
@@ -10,7 +10,7 @@ import {
 import { KEY_ENV, saveConfig } from "../src/core/config";
 import { loadGlossaryFile } from "../src/core/glossary";
 import type {
-  ApiError, EstimateDTO, ExportPreview, GameView, GlossarySaveResult, NameLang, SettingsPatch, KeyStatus, SettingsDTO, ToolDTO, TranslateOptionsDTO,
+  ApiError, EstimateDTO, ExportPreview, TestPreview, GameView, GlossarySaveResult, NameLang, SettingsPatch, KeyStatus, SettingsDTO, ToolDTO, TranslateOptionsDTO,
 } from "../shared/api";
 import { PAID_ENGINES, SOURCE_LANGS, TRANSLATE_ENGINES } from "../shared/api";
 import type { EncryptedKeyStore } from "./keystore";
@@ -213,6 +213,27 @@ export class Backend {
   exportRun(id: string, force: boolean) {
     return this.exclusive("chép vào game", () => {
       const r = exportGame(this.session(id), { force });
+      return { results: r.results, notes: r.notes, card: describeGame(this.ctx, getGame(this.ctx, id)) };
+    });
+  }
+
+  testPreview(id: string, files: string[]): TestPreview {
+    if (this.job) throw new ApiFailure({ code: "busy", message: `Đang ${this.job.kind} – chờ xong rồi dịch thử.` });
+    const s = this.session(id);
+    const made = buildTestMark(s, files);
+    const r = exportTestMark(s, { dryRun: true }).results;
+    return {
+      files: made.files, lines: made.lines,
+      write: r.filter(x => x.status === "new" || x.status === "update").map(x => x.name),
+      same: r.filter(x => x.status === "same").length,
+      conflicts: r.filter(x => x.status === "conflict").map(x => x.name),
+      missingSource: r.filter(x => x.status === "missing-source").map(x => x.name),
+    };
+  }
+
+  testRun(id: string, force: boolean) {
+    return this.exclusive("chép bản dịch thử", () => {
+      const r = exportTestMark(this.session(id), { force });
       return { results: r.results, notes: r.notes, card: describeGame(this.ctx, getGame(this.ctx, id)) };
     });
   }

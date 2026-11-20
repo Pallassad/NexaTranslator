@@ -25,7 +25,10 @@ function DialogSwitch() {
     case "export": {
       const p = d.preview;
       return (
-        <Dialog icon="i-export" title="Chép bản dịch vào game" desc="Kết quả chạy thử – chưa ghi gì vào game." wide onClose={close}
+        <Dialog icon={d.test ? "i-flask" : "i-export"} title={d.test ? "Chép bản dịch thử [VI] vào game" : "Chép bản dịch vào game"}
+          desc={d.test
+            ? `Đã thêm [VI] vào ${d.test.lines.toLocaleString("vi-VN")} dòng trong ${d.test.files} file. Chưa ghi gì vào game – bản gốc luôn được giữ để Khôi phục.`
+            : "Kết quả chạy thử – chưa ghi gì vào game."} wide onClose={close}
           footer={<>
             <button className="btn ghost left" onClick={close}>Hủy</button>
             {p.conflicts.length > 0 && <button className="btn" onClick={() => exportRun(true)}>Ghi đè cả file xung đột (có sao lưu)</button>}
@@ -33,6 +36,7 @@ function DialogSwitch() {
               {p.conflicts.length ? "Chép, bỏ qua file xung đột" : `Chép ${p.write.length} file`}
             </button>
           </>}>
+          {d.test && <Notice tone="info">Bản dịch thật (nếu có) không bị ảnh hưởng – sau khi xem xong, bấm <b>Khôi phục</b> hoặc <b>Chép vào game</b> để thay bản thử.</Notice>}
           <div className="exp-sum">
             <div><b>{p.write.length}</b><span>file sẽ chép / cập nhật</span></div>
             <div><b>{p.same}</b><span>file giống hệt, bỏ qua</span></div>

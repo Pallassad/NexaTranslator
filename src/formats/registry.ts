@@ -1,12 +1,14 @@
 import { rpgmData } from "./rpgm-data";
 import { rpgmKnsCsv } from "./rpgm-kns-csv";
+import { rpgmRemLoc } from "./rpgm-rem-loc";
+import { rpgmLangTsv } from "./rpgm-lang-tsv";
 import { rpgmNotFound } from "./rpgm/game";
 import type { DetectedFormat, FormatAdapter } from "./types";
 
 /**
  * Danh sách các bộ đọc định dạng. Thêm định dạng mới (vd rpgm-kns-csv, renpy) → thêm vào đây.
  */
-export const ADAPTERS: FormatAdapter[] = [rpgmKnsCsv, rpgmData];
+export const ADAPTERS: FormatAdapter[] = [rpgmRemLoc, rpgmLangTsv, rpgmKnsCsv, rpgmData];
 
 /** Mọi định dạng game này dùng, xếp theo priority (cao nhất trước). */
 export function detectFormats(root: string, adapters: FormatAdapter[] = ADAPTERS): DetectedFormat[] {

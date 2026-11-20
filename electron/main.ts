@@ -110,6 +110,8 @@ handle("game:fixError", (id: string, w: number | undefined, key: string, tr: str
 handle("game:keepErrors", (id: string, w: number | undefined, keys: string[]) => backend.keepErrors(id, w, keys));
 handle("game:unkeepErrors", (id: string, w?: number) => backend.unkeepErrors(id, w));
 handle("game:retranslateErrors", (id: string, w: number | undefined, keys: string[], max?: number) => backend.retranslateErrors(id, w, keys, max));
+handle("game:testPreview", (id: string, files: string[]) => backend.testPreview(id, files));
+handle("game:testRun", (id: string, force: boolean) => backend.testRun(id, force));
 handle("game:glossary", (id: string) => backend.glossary(id));
 handle("game:saveGlossary", (id: string, w: number | undefined, g: UserGlossaryInput) => backend.saveGlossary(id, w, g));
 handle("game:actorNames", (id: string) => backend.actorNames(id));

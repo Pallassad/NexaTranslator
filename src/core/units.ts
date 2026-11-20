@@ -1,5 +1,5 @@
 import type { Entry } from "./types";
-import { splitAffix, protect, restore, visibleLength, type Affix } from "./protect";
+import { CODE, splitAffix, protect, restore, visibleLength, type Affix } from "./protect";
 import { cleanTranslation, wrapText } from "./postprocess";
 import type { GlossaryMatcher } from "./glossary";
 
@@ -52,6 +52,40 @@ function allSame(xs: string[]): boolean {
   return xs.every(x => x === xs[0]);
 }
 
+/**
+ * Chia câu thành ĐÚNG n dòng dài gần bằng nhau (ngắt tại dấu cách). Ít chữ hơn số dòng → dòng cuối để trống.
+ * Vd splitEven("một hai ba bốn", 2) → ["một hai", "ba bốn"].
+ */
+export function splitEven(text: string, n: number): string[] {
+  if (n <= 1) return [text];
+  const words = text.split(" ").filter(Boolean);
+  const out: string[] = [];
+  let start = 0;
+  for (let k = 1; k < n; k++) {
+    const remainLines = n - k + 1;
+    const rest = words.slice(start);
+    const total = visibleLength(rest.join(" "));
+    const target = total / remainLines;
+    // Lấy thêm từ cho tới khi dòng gần target nhất (luôn chừa ít nhất 1 từ cho mỗi dòng sau nếu đủ từ)
+    let end = start, len = 0, best = start, bestDiff = Infinity;
+    // Luôn được lấy ít nhất 1 từ (nếu còn) → câu quá ngắn thì chữ nằm ở đầu, các dòng sau để trống
+    const maxEnd = Math.max(Math.min(start + 1, words.length), words.length - (n - k));
+    while (end < maxEnd) {
+      len += (end > start ? 1 : 0) + visibleLength(words[end]);
+      end++;
+      const diff = Math.abs(len - target);
+      if (diff <= bestDiff) { best = end; bestDiff = diff; } else break;
+    }
+    out.push(words.slice(start, best).join(" "));
+    start = best;
+  }
+  out.push(words.slice(start).join(" "));
+  return out;
+}
+
+/** Có chữ / số thật sau khi bỏ mã điều khiển (dòng chỉ có mã thì không cần dịch). */
+export const hasLetters = (s: string) => /[\p{L}\p{N}]/u.test(s.replace(CODE, ""));
+
 /** Đơn vị cho 1 khối thoại (nhiều dòng 401 liên tiếp = 1 khung thoại). */
 function dialogueUnit(entries: Entry[], opt: UnitOptions): Unit {
   const parts: Affix[] = entries.map(e => splitAffix(e.source));
@@ -69,12 +103,14 @@ function dialogueUnit(entries: Entry[], opt: UnitOptions): Unit {
     return (pre + p.core.trim() + suf).trim();
   }));
   const seg = protect(core, opt.glossary);
+  // Khối chỉ có mã, không có chữ (vd mỗi dòng 1 mã \tl{A0631}) → giữ nguyên từng dòng, không gộp
+  const hasWords = hasLetters(core);
 
   return {
     entries,
-    segments: core ? [seg] : [],
+    segments: hasWords ? [seg] : [],
     assemble([translated]) {
-      if (!core) {
+      if (!hasWords) {
         // Dòng chỉ có mã (vd chỉ có khung tên \n<Rin>) → giữ nguyên, chỉ đổi tên theo glossary
         for (const e of entries) e.target = names(e.source, opt);
         return null;
@@ -84,7 +120,9 @@ function dialogueUnit(entries: Entry[], opt: UnitOptions): Unit {
       const r = restore(cleanTranslation(translated), seg.tokens.map(t => t.replace(/ /g, NBSP)));
       if (!r.ok) return r.reason;
 
-      const lines = wrapText(r.text, opt.maxChars).map(l => l.replace(NBSP_RE, " "));
+      let wrapped = entries[0].fixedLines ? splitEven(r.text, n) : wrapText(r.text, opt.maxChars);
+      if (entries[0].fillLines && wrapped.length < n) wrapped = splitEven(r.text, n);
+      const lines = wrapped.map(l => l.replace(NBSP_RE, " "));
       const deco = lines.map((line, i) => {
         const pre = samePrefix ? prefixes[0] : i === 0 ? prefixes[0] : "";
         const suf = sameSuffix ? suffixes[0] : i === lines.length - 1 ? suffixes[suffixes.length - 1] : "";
@@ -107,7 +145,7 @@ function dialogueUnit(entries: Entry[], opt: UnitOptions): Unit {
 function singleUnit(entry: Entry, opt: UnitOptions): Unit {
   const lines = entry.source.split("\n").map(splitAffix);
   const segs = lines.map(l => protect(l.core, opt.glossary));
-  const idx = segs.map((s, i) => (s.text.trim() ? i : -1)).filter(i => i >= 0);
+  const idx = segs.map((s, i) => (hasLetters(lines[i].core) ? i : -1)).filter(i => i >= 0);
 
   return {
     entries: [entry],
@@ -140,7 +178,7 @@ function speakerUnit(entry: Entry, opt: UnitOptions): Unit {
 
 /** Độ rộng dòng thoại lớn nhất của game (dùng làm giới hạn khi ngắt dòng). */
 export function measureMaxChars(entries: Entry[]): number {
-  const lens = entries.filter(e => e.kind === "dialogue").map(e => visibleLength(e.source.trim()));
+  const lens = entries.filter(e => e.kind === "dialogue" && !e.fixedLines).map(e => visibleLength(e.source.trim()));
   if (lens.length === 0) return 50;
   lens.sort((a, b) => a - b);
   // Lấy phân vị 98% để bỏ qua vài dòng dài bất thường

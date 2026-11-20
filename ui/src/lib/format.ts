@@ -33,14 +33,14 @@ export function ago(t: number): string {
 
 /** Tên nhóm file hiển thị (nhóm do bộ đọc trả về). */
 export const GROUP_LABEL: Record<string, string> = {
-  story: "Thoại", quest: "Nhiệm vụ", items: "Vật phẩm", skills: "Kỹ năng", npc: "NPC",
+  story: "Thoại", desc: "Tên & mô tả", quest: "Nhiệm vụ", items: "Vật phẩm", skills: "Kỹ năng", npc: "NPC",
   system: "Hệ thống", actors: "Nhân vật", classes: "Nghề nghiệp", enemies: "Kẻ địch", other: "Khác",
 };
-export const GROUP_ORDER = ["story", "quest", "items", "skills", "npc", "actors", "classes", "enemies", "system", "other"];
+export const GROUP_ORDER = ["story", "desc", "quest", "items", "skills", "npc", "actors", "classes", "enemies", "system", "other"];
 export const groupLabel = (g: string) => GROUP_LABEL[g] ?? g;
 
 /** Tên định dạng dễ hiểu cho người dùng (bộ đọc trả về tên kỹ thuật). */
-const FORMAT_LABEL: Record<string, string> = { "rpgm-data": "Dữ liệu JSON", "rpgm-kns-csv": "Bảng CSV (plugin KNS)" };
+const FORMAT_LABEL: Record<string, string> = { "rpgm-data": "Dữ liệu JSON", "rpgm-kns-csv": "Bảng CSV (plugin KNS)", "rpgm-rem-loc": "Thư mục loc (www\\loc)", "rpgm-lang-tsv": "Bảng Languages.tsv" };
 export const formatLabel = (f: { id: string; label: string }) => FORMAT_LABEL[f.id] ?? f.label;
 
 /** Trạng thái dịch của 1 game. Đang chạy dịch → luôn là "đang dịch". */

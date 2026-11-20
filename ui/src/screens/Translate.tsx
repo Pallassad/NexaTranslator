@@ -3,7 +3,7 @@ import type { FileItem, TranslateEngine } from "../../../shared/api";
 import { Empty, GameIcon, Notice, Spinner, usePopover } from "../components/common";
 import { I, type IconId } from "../components/Icon";
 import {
-  estimate, exportPreview, openGame, restorePreview, setFormat, stop, translate,
+  estimate, exportPreview, openGame, restorePreview, setFormat, stop, testPreview, translate,
 } from "../lib/actions";
 import { duration, fmt, formatLabel, GROUP_ORDER, groupLabel, minutesRange, usd, usdRange } from "../lib/format";
 import { go, setState, useApp, type LogLine } from "../lib/store";
@@ -158,6 +158,19 @@ function FilePanel() {
         {v.format.id === "rpgm-data" && v.card.formats.some(f => f.id === "rpgm-kns-csv") && (
           <div style={{ margin: "4px 6px 8px" }}><Notice tone="warning">Thoại của game này nằm trong <b>csv\</b>. Định dạng JSON chỉ có mã như <b>event_data_base_text_12</b> nên hầu như không có gì để dịch.</Notice></div>
         )}
+        {v.format.id === "rpgm-data" && v.card.formats.some(f => f.id === "rpgm-lang-tsv") && (
+          <div style={{ margin: "4px 6px 8px" }}><Notice tone="warning">
+            Thoại của game này nằm trong <b>data\Languages.tsv</b>. Event chỉ có mã như <b>\tl{"{A0001}"}</b>.
+            Dịch bảng này trước, sau đó có thể dịch thêm data\ cho phần tên vật phẩm / kỹ năng chưa có trong bảng.
+            <div style={{ marginTop: 8 }}><button className="btn sm" disabled={running} onClick={() => setFormat("rpgm-lang-tsv")}>Chuyển sang dịch Languages.tsv</button></div>
+          </Notice></div>
+        )}
+        {v.format.id === "rpgm-data" && v.card.formats.some(f => f.id === "rpgm-rem-loc") && (
+          <div style={{ margin: "4px 6px 8px" }}><Notice tone="warning">
+            Chữ hiện trong game này nằm ở <b>www\loc</b>. File trong data\ phần lớn chỉ là mã như <b>\REM_MAP[...]</b>.
+            <div style={{ marginTop: 8 }}><button className="btn sm" disabled={running} onClick={() => setFormat("rpgm-rem-loc")}>Chuyển sang dịch www\loc</button></div>
+          </Notice></div>
+        )}
         {groups.map(([g, items]) => {
           const shown = items.filter(f => f.name.toLowerCase().includes(ql));
           if (ql && !shown.length) return null;
@@ -301,6 +314,14 @@ function Stage() {
         <span className="st"><I id="i-play" size="sm" /><b>Dịch</b></span><I id="i-chev-right" size="sm" />
         <span className="st"><I id="i-export" size="sm" /><b>Chép vào game</b></span><I id="i-chev-right" size="sm" />
         <span className="st">Chơi thử trong game</span>
+      </div>
+      <div className="test-card">
+        <div className="grow">
+          <strong>Dịch thử trước, chưa tốn tiền</strong>
+          <span>Nexa thêm <span className="code">[VI]</span> vào đầu mọi câu nó sẽ dịch rồi chép vào game. Vào game xem: chỗ có [VI] là Nexa dịch tới,
+            chỗ vẫn tiếng gốc là Nexa chưa đọc được. Xem xong bấm <b>Khôi phục</b>.</span>
+        </div>
+        <button className="btn" onClick={testPreview} disabled={!s.sel.size || !!s.run}><I id="i-flask" />Dịch thử [VI]</button>
       </div>
     </div>
   </>);

@@ -9,3 +9,4 @@ library.json
 keys.json
 .nexa/
 release/
+deploy.local.json

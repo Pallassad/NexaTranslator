@@ -10,9 +10,11 @@
 const CODE_SRC = [
   // @ec(...) – đoạn script trong chữ (plugin KNS), cho phép lồng ngoặc 3 tầng
   String.raw`@ec\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\)`,
-  String.raw`\\\\+[A-Za-z]+\[[^\]\n]*\]`,  // \\C[27] – mã viết 2 dấu gạch (chữ đi qua script trước khi hiện)
-  String.raw`\\[A-Za-z]+\[[^\]\n]*\]`,   // \C[2] \N[1] \V[3] \FS[24] \PX[100]
+  String.raw`\\\\+[A-Za-z][A-Za-z0-9_]*\[[^\]\n]*\]`,  // \\C[27] – mã viết 2 dấu gạch (chữ đi qua script trước khi hiện)
+  String.raw`\\[A-Za-z][A-Za-z0-9_]*\[[^\]\n]*\]`,   // \C[2] \N[1] \FS[24] \REM_DESC[skill_51_name]
   String.raw`\\[A-Za-z]+<[^>\n]*>`,      // \Picture<abc> (VisuStella)
+  String.raw`\\[A-Za-z]+\{[^}\n]*\}`,    // \tl{A0001} – tra bảng Languages.tsv (VisuStella)
+  String.raw`\\f[bir](?![A-Za-z\[])`,   // \fb \fi \fr – chữ đậm / nghiêng / bỏ định dạng (YEP MessageCore)
   String.raw`\\[A-Za-z](?![A-Za-z\[])`,  // \G \I (mã 1 chữ cái không có [...])
   String.raw`\\[^A-Za-z\s]`,             // \! \. \| \{ \} \^ \$ \\
   String.raw`<\/?[A-Za-z][^<>\n]{0,30}>`, // <center> <WordWrap> </b>

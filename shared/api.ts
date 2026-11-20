@@ -70,6 +70,12 @@ export interface TranslateOptionsDTO {
 export const TRANSLATE_ENGINES = ["google", "claude-haiku", "claude-sonnet"] as const;
 export type TranslateEngine = (typeof TRANSLATE_ENGINES)[number];
 
+export interface TestPreview extends ExportPreview {
+  /** Số file / dòng được đánh dấu [VI]. */
+  files: number;
+  lines: number;
+}
+
 export interface ExportPreview {
   /** Sẽ chép mới / cập nhật. */
   write: string[];
@@ -159,6 +165,10 @@ export interface NexaApi {
     unkeepErrors(id: string, width: number | undefined): Promise<GameView>;
     /** Nhờ AI dịch lại (hỏi trước qua onPrompt). */
     retranslateErrors(id: string, width: number | undefined, keys: string[], maxCost?: number): Promise<{ result: RetranslateResult; view: GameView }>;
+    /** Dịch thử: tạo bản thêm "[VI] " cho các file đã chọn rồi chạy thử chép vào game. */
+    testPreview(id: string, files: string[]): Promise<TestPreview>;
+    /** Chép bản dịch thử vào game. */
+    testRun(id: string, force: boolean): Promise<{ results: FileResult[]; notes: string[]; card: GameCard }>;
     glossary(id: string): Promise<GlossaryView>;
     /** Lưu phần glossary người dùng sửa (keep / terms / translate). */
     saveGlossary(id: string, width: number | undefined, g: UserGlossaryInput): Promise<GlossarySaveResult>;
