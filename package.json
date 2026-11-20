@@ -1,0 +1,72 @@
+{
+  "name": "nexa-translation",
+  "version": "1.0.0",
+  "description": "Dịch game sang tiếng Việt (RPG Maker MV/MZ)",
+  "main": "dist-electron/main.mjs",
+  "scripts": {
+    "dev": "tsx src/cli.ts",
+    "app:dev": "node scripts/app-dev.mjs",
+    "app:build": "vite build -c ui/vite.config.ts && node scripts/build-electron.mjs",
+    "app": "npm run app:build && electron dist-electron/main.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc && tsc -p ui && tsc -p electron",
+    "dist": "npm run app:build && electron-builder --win --x64"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@types/fontkit": "^2.0.9",
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.3.0",
+    "electron": "^45.4.1",
+    "electron-builder": "^26.18.0",
+    "esbuild": "^0.28.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.0"
+  },
+  "dependencies": {
+    "fontkit": "^2.0.4"
+  },
+  "productName": "Nexa Translation",
+  "build": {
+    "appId": "vn.pallas.nexa-translation",
+    "productName": "Nexa Translation",
+    "copyright": "Pallas",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist-electron/**/*",
+      "dist/ui/**/*",
+      "package.json",
+      "!**/*.map"
+    ],
+    "extraResources": [
+      {
+        "from": "assets",
+        "to": "assets"
+      }
+    ],
+    "asar": true,
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        "zip",
+        "portable"
+      ],
+      "artifactName": "NexaTranslation-${version}-${arch}.${ext}"
+    },
+    "portable": {
+      "artifactName": "NexaTranslation-${version}-portable.exe"
+    }
+  }
+}

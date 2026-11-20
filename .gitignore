@@ -1,0 +1,11 @@
+node_modules/
+samples/
+output/
+.env
+projects/
+dist/
+dist-electron/
+library.json
+keys.json
+.nexa/
+release/
